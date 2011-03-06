@@ -61,7 +61,11 @@ class Output:
         if not len(self.content): # no posts yet, so add OP post with special formatting
             add_image()
             add_header('filetitle')
-            self._post += u'<blockquote>' + html.tostring(post['text'], encoding = 'utf-8').decode('utf-8') + u'</blockquote>'
+            if post['text'] != '':
+                _text = html.tostring(post['text'], encoding = 'utf-8').decode('utf-8')
+            else:
+                _text = ''
+            self._post += u'<blockquote>' + _text + u'</blockquote>'
         else: # replies
             add_header('replytitle')
             add_image()
