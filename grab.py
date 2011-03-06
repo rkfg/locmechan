@@ -19,33 +19,50 @@ def select_parser(url):
 # load threads list from threads.txt
 
 if len(sys.argv) < 3:
-    print "Insufficient args."
+    print >> sys.stderr, "Insufficient args."
     sys.exit(1)
 
 def get():
+    if os.path.isfile('lock.pid'):
+        pidfile = open('lock.pid', 'r')
+        pid = pidfile.read()
+        pidfile.close()
+        try:
+            os.kill(int(pid), 0)
+        except OSError:
+            pass
+        else:
+            print >> sys.stderr, "Already running instance"
+            sys.exit(2)
+
+    pidfile = open('lock.pid', 'w')
+    pidfile.write(str(os.getpid()))
+    pidfile.close()
+    
     for modfile in os.listdir('parsers'):
         if modfile.endswith('.py'):
             try:
                 name = "parsers/" + modfile[:-3]
                 parsefile, pathname, description = imp.find_module(name)
             except:
-                print 'MODULE: %s not found' % modfile[:-3]
+                print >> sys.stderr, 'MODULE: %s not found' % modfile[:-3]
                 sys.exit(1)
 
-            #try:
-            method = imp.load_module(name, parsefile, pathname, description).info
-            #except:
-            #    print 'MODULE: can\'t load %s' % modfile[:-3]
+            try:
+                method = imp.load_module(name, parsefile, pathname, description).info
+            except:
+                print >> sys.stderr, 'MODULE: can\'t load %s' % modfile[:-3]
 
-            #else:
-            parsers.append(method())
+            else:
+                parsers.append(method())
 
     try:
         _threadsfile = open(sys.argv[2], 'r')
         _threads = _threadsfile.read().split()
         _threadsfile.close()
+        _threads = filter(lambda x: x != '', _threads)
     except IOError:
-        print "Error opening threads file " + sys.argv[1]
+        print >> sys.stderr, "Error opening threads file " + sys.argv[1]
         sys.exit(1)
 
     # for every thread
@@ -58,6 +75,7 @@ def get():
     # make lxml from the data 
         _activeparser = select_parser(url)
         if _activeparser:
+            print >> sys.stderr, "Checking " + url
             if not _activeparser.died:
                 purgedthreads.append(url)
                 _toDownload = _activeparser.get_posts_number()
@@ -84,8 +102,10 @@ def get():
                     title = _activeparser.get_title()
                     output_writer = Output(_activeparser.outname[:-5], title = title[0], board = title[1])
 
+                postcnt = len(_toDownload) - 1
                 for post in _toDownload:
             #{{{
+                    print >> sys.stderr, "Adding post #" + post + " (" + str(postcnt) + " left)"
                     #    get the post from thread
                     newpost = _activeparser.get_post(post)
                     #    add this post to the end
@@ -94,18 +114,21 @@ def get():
                     post_image = _activeparser.get_images(post)
                     if post_image:
                         #    download images and thumbs
+                        print >> sys.stderr, "Downloading image for post..."
                         output_writer.download_images(*post_image)
+                    postcnt -= 1
 
             #}}}
 
             # save the thread
                 output_writer.save(_activeparser.outname)
         else:
-            print "Unsupported url: " + url
+            print >> sys.stderr, "Unsupported url: " + url
 
     threadfile = open(sys.argv[2], 'w')
     threadfile.write('\n'.join(purgedthreads))
     threadfile.close()
+    os.unlink('lock.pid')
 
     #}}}
 
