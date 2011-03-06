@@ -1,0 +1,343 @@
+html, body {
+	background-image: url(http://blondie.ru/sites/all/themes/blond5/img/bg.png);
+	background-color: #ff8da3;
+	color: #FFF;
+	font-family: "Trebuchet MS",Trebuchet,tahoma,serif;
+}
+a {
+	color: #FF0080;
+}
+a:hover {
+	color: #FF4500;
+}
+input[type="text"], input[type="file"], input[type="password"], textarea, select {
+	-moz-box-sizing: content-box;
+	-webkit-box-sizing: content-box;
+	box-sizing: content-box;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	appearance: none;
+	background-color: #FFF0F0;
+	color: #a52b43;
+	border: 2px solid #FF0080;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+#postform {
+	background: #ff8da3;
+}
+.adminbar {
+        text-align:right;
+	color: #FF0080;
+	border: 2px solid #FF0080;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	padding: 4px;
+        background: url(http://blondie.ru/sites/all/themes/blond5/img/block-title.png) repeat-x #8e172e;
+        clear:both;
+        float:right;
+	font-size: .8em;
+}
+.adminbar a {
+	font-weight: bold;
+	color: #FFFFFF;
+	background: transparent;
+}
+#postform textarea {
+	background: url(http://www.artgif.ru/LOVE/serdse055.gif) #FFFFFF right bottom no-repeat;
+}
+.logo {
+	clear:both;
+	text-align:left;
+	font-size:2em;
+	font-weight: bold;
+	text-shadow: #000 0px 0px 5px;
+	color:#FFFFFF;
+}
+.logo a {
+	text-shadow: #000 0px 0px 5px;
+	color:#FFFFFF;
+}
+.logo2 {
+	text-align:center;
+}
+.theader, .passvalid {
+	background:#FFFFFF;
+	text-align:center;
+	padding:2px;
+	color:#fe007e;
+	clear: both;
+	font-weight: bold;
+	margin-bottom: .5em;
+	border: solid 2px #8e172e;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+.postarea {
+}
+.rules {
+	border: dashed 1px #8e172e;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	color: #515151;
+	opacity: .7;
+	background-image: url(http://rghost.ru/4331260/image.png);
+}
+a.highslide img {
+	visibility: hidden !important;
+	width: 1px !important;
+}
+a.highslide:before {
+	content: url(http://2-ch.ru/icons/inc_neut.png) !important;
+	visibility: visible !important;
+	position: relative !important;
+	top: 2px !important;
+	padding-right: 2px;
+}
+.postblock {
+	background:transparent;
+	color:#FFFFFF;
+	font-weight:bold;
+}
+.footer {
+	text-align:center;
+	font-size:12px;
+	font-family:serif;
+	margin: 2em 0 0 0;
+	background: #FFAECA;
+	opacity: .8;
+}
+.dellist {
+	font-weight: bold;
+	text-align:center;
+}
+.delbuttons {
+	text-align:center;
+	padding-bottom:4px;
+}
+.managehead {
+	background:#ff8da3;
+	color:#FFFFFF;
+	padding:0px;
+}
+.postlists {
+	background:#FFFFFF;
+	width:100%;
+	padding:0px;
+	color:#800000;
+}
+.row1 {
+	background:#FFFFFF;
+	color:#002244;
+}
+.row2 {
+	background:#fcf5ef;
+	color:#002244;
+}
+.unkfunc {
+	background:inherit;
+	color:#FF1212;
+}
+.reflink {
+	font-size: .8em;
+	font-weight: bold;
+}
+.reflink a{
+	color: #FC0000;
+}
+.filesize {
+	text-decoration:none;
+	color: #FF0000;
+	font-size: .8em;
+}
+.filetitle {
+	background:inherit;
+	font-size:1.2em;
+	color:#FFF;
+	font-weight:bold;
+}
+.postername {
+	/*
+	color:#004A99;
+	font-weight:bold;
+	display:none;
+	*/
+}
+.postertrip {
+	color:#212121;
+}
+.oldpost, .notabene {
+	color:#CC1105;
+	font-weight:bold;
+}
+.omittedposts {
+	color:#666666;
+}
+.reply {
+	background-color: #FFF0F0;
+	color: #a52b43;
+	border: 2px solid #FF0080;
+	padding: 0;
+	margin: 0;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	opacity: .8;
+}
+.reply .thumbnailmsg {
+	color: #a52b43
+}
+blockquote {
+	background-color: #FFF0F0;
+	color: #a52b43;
+	margin: .5em .5em .5em 1em;
+	border: 0px solid transparent;
+	padding: 5px;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+}
+blockquote:empty {
+	background: transparent;
+}
+.reply blockquote {
+	margin: .5em;
+}
+.doubledash {
+	display: none;
+ 	vertical-align:top;
+	clear:both;
+	float:left;
+}
+.replytitle {
+	font-size: 1.2em;
+	color:#002244;
+	font-weight:bold;
+}
+.commentpostername {
+	/*
+	color:#004A99;
+	font-weight:800;
+	display:none;
+	*/
+}
+.thumbnailmsg {
+	font-size: .6em;
+	color:#FFFFFF;
+}
+hr {
+	border-style: dotted none none none;
+	border-width: 2px;
+	border-color: #FF0000;
+}
+table {
+	border-style: none;
+}
+table td {
+	border-style: none;
+}
+.nothumb {
+	background-color: #ffb5c4;
+	border-style: dotted;
+	margin: .3em .5em;
+}
+.omittedposts {
+	color:#FAFAFA;
+}
+.abbrev {
+	color: #666666;
+} 
+small[id*="rfmap"] .abbrev {
+	color: #999999;
+}
+.highlight {
+	background:#EEDACB;
+	color:#333333;
+	border: 2px dashed #EE6600;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-border-radius: 5px;
+}
+.highlight blockquote {
+	background: transparent;
+}
+.extrafunctions {
+	color:#008000;
+}
+dl.menu dt, td.header {
+	background:#FFFFFF !important;
+	border: solid 1px #8e172e !important;
+	-moz-border-radius: 5px !important;
+	-webkit-border-radius: 5px  !important;
+	border-radius: 5px  !important;
+	margin-top: 1em !important;
+	padding-left: .5em !important;
+	cursor: pointer !important;
+	color: #FF0080 !important;
+	font-weight: bold !important;
+}
+dl.menu dd {
+	margin-left: .5em !important;
+	padding-left: .5em !important;
+	border-left: solid 1px #8e172e !important;
+	background:#ff8da3 !important;
+}
+dl.menu dd a{
+	color: #FFFFFF;
+}
+dl.menu dd:hover {
+	background: #ff9ca8 !important;
+}
+dl.menu dd.hidden {
+	display: none !important;
+}
+dl#menu {
+	background-color: #ff8da3 !important;
+}
+p.spoiler > span.warning {
+	color: #FF6600;
+	font-weight: bolder;
+}
+span.spoiler {
+	background: #ffaeca;
+	color: #ffaeca;
+}
+span.spoiler:hover {
+	color: #333333;
+}
+ .u { text-decoration: underline; } 
+ .s {text-decoration: line-through;} 
+ .o { text-decoration: overline; }
+ 
+span.mod {
+	color: #2266AA;
+}
+
+span.adm {
+	color: #800080;
+}
+
+.locked {
+	width: 50% !important;
+	margin: 20px !important;
+	text-align: center !important;
+	background-color: #151515 !important;
+	border:1px solid #CCCCCC !important;
+	/*-moz-box-shadow: #454545 -1px -1px 1em, #454545 1px 1px 2em !important;
+	-webkit-box-shadow: #454545 -1px -1px 1em, #454545 1px 1px 2em !important;
+	box-shadow: #454545 -1px -1px 1em, #454545 1px 1px 2em !important;*/
+}
+.msgheader {
+	background-color: #CCCCCC !important;
+	color: #FF6600 !important;
+}
+.msg {
+	background-color: #EEEEEE !important;
+	color: #212121 !important;
+	font-size: .9em !important;
+}
