@@ -102,6 +102,7 @@ def get():
                     title = _activeparser.get_title()
                     output_writer = Output(_activeparser.outname[:-5], title = title[0], board = title[1])
 
+                _toDownload.sort(cmp = lambda x,y: int(x) - int(y))
                 postcnt = len(_toDownload) - 1
                 for post in _toDownload:
             #{{{
