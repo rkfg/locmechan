@@ -84,7 +84,7 @@ class Output:
         if len(_id):
             if len(_id[0].xpath('p[@style="color: #ff0000; font-style: italic;"]')):
                 return
-            _id[0].insert(-1, html.fromstring(u'<p style="color: #ff0000; font-style: italic;">Пост был удалён.</p>'))
+            _id[0].insert(len(_id[0]), html.fromstring(u'<p style="color: #ff0000; font-style: italic;">Пост был удалён.</p>'))
 
     def download_images(self, image, thumb):
         imagepath = os.path.join("threads/images", self.threadnumber)
