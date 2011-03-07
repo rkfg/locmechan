@@ -94,17 +94,20 @@ class Output:
         if not os.path.isdir(thumbpath):
             os.makedirs(thumbpath)
 
-        link = urllib2.urlopen(image)
-        imgfile = open(os.path.join(imagepath, os.path.basename(image)), 'w')
-        imgfile.write(link.read())
-        link.close()
-        imgfile.close()
-        
-        link = urllib2.urlopen(thumb)
-        thumbfile = open(os.path.join(thumbpath, os.path.basename(thumb)), 'w')
-        thumbfile.write(link.read())
-        link.close()
-        thumbfile.close()
+        try:
+            link = urllib2.urlopen(image)
+            imgfile = open(os.path.join(imagepath, os.path.basename(image)), 'w')
+            imgfile.write(link.read())
+            link.close()
+            imgfile.close()
+
+            link = urllib2.urlopen(thumb)
+            thumbfile = open(os.path.join(thumbpath, os.path.basename(thumb)), 'w')
+            thumbfile.write(link.read())
+            link.close()
+            thumbfile.close()
+        except urllib2.HTTPError:
+            print >> sys.stderr, "Not found!"
 
     def get_posts_number(self):
         _reflinks = self.output.xpath('//span[@class="reflink"]/a/text()')
@@ -114,6 +117,9 @@ class Output:
             return None
 
     def save(self, filename):
+        if not os.path.isdir("threads"):
+            os.mkdir("threads")
+            
         result = open(os.path.join("threads", filename), 'w')
         result.write(html.tostring(self.output, encoding='utf-8', include_meta_content_type = True))
         result.close()

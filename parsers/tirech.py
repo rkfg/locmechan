@@ -14,7 +14,6 @@ class Parser(BasicParser):
         except IOError, c:
             if "failed to load HTTP resource" in str(c):
                 self.died = True
-            return
         
         _pathcomp = source.split('/')
         self.outname = "_".join(["tirech", _pathcomp[3], _pathcomp[5]])
