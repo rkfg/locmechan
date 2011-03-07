@@ -123,6 +123,8 @@ def get():
 
             # save the thread
                 output_writer.save(_activeparser.outname)
+            else:
+                print >> sys.stderr, "Thread died: " + url
         else:
             print >> sys.stderr, "Unsupported url: " + url
 
