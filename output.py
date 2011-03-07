@@ -13,19 +13,22 @@ class Output:
     def __init__(self, threadnumber, board=u'Бред', title=u'Бред', infile=''):
         self.threadnumber = threadnumber
         if infile:
+            # get infile as the base for adding/marking
             self.output = html.parse(infile)
         else:
+            # get empty template
             _templatefile = open("templates/photon.html", 'r')
             _template = _templatefile.read()
             _templatefile.close()
             _template = _template.decode('utf-8').replace("{{title}}", title).replace("{{board}}", board)
             self.output = html.fromstring(_template)
 
-        #print _template
         self.content = self.output.xpath("//div[@id='content']")[0]
+        # load post template
         _postFile = open("templates/post.html", 'r')
         self.post = _postFile.read().decode('utf-8')
         _postFile.close()
+        # load image template
         _imgFile = open("templates/img.html", 'r')
         self.img = _imgFile.read().decode('utf-8')
         _imgFile.close()
@@ -33,8 +36,6 @@ class Output:
     def add_post(self, post):
         if not 'postnumber' in post:
             raise MalformedPostError
-
-        #print post
 
         self._post = ''
 
@@ -123,7 +124,8 @@ class Output:
         result = open(os.path.join("threads", filename), 'w')
         result.write(html.tostring(self.output, encoding='utf-8', include_meta_content_type = True))
         result.close()
-    
+
+# kinda unit test, what a shame...
 if __name__ == "__main__":
 #    out = Output("100500", "Бред", "Хуита", infile = "threads/result.html")
     out = Output("100500", "Бред", "Хуита")

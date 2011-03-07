@@ -16,7 +16,9 @@ class Parser(BasicParser):
                 self.died = True
         
         _pathcomp = source.split('/')
+        # name of file for saving thread
         self.outname = "_".join(["tirech", _pathcomp[3], _pathcomp[5]])
+        # the same name without .html (for images/thumbs dirs)
         self.threadnum = _pathcomp[5][:-5]
 
     def get_posts_number(self):
@@ -53,8 +55,10 @@ class Parser(BasicParser):
         
         _basetag = _basetag[0]
         result['postnumber'] = postNumber
+        # title of reply
         _topic = _basetag.xpath('following-sibling::label/span[@class="replytitle"]/text()')
         if not len(_topic):
+            # maybe it's OP post?
             _topic = _basetag.xpath('following-sibling::label/span[@class="filetitle"]/text()')
         if len (_topic):
             result['topic'] = _topic[0]
@@ -104,8 +108,10 @@ class Parser(BasicParser):
 #   add posts from soup object to the end of the thread
 
 def info():
+    # here we return list of links prefix and parser class
     return [['http://2-ch.ru', 'http://www.2-ch.ru'], Parser]
-    
+
+# sorta unit test, lol
 if __name__ == "__main__":
     parser = Parser("samples/2-ch.html")
     print parser.get_post("13294318")

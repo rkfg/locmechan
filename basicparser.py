@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from BeautifulSoup import BeautifulSoup, Tag, NavigableString
 from lxml import html
 
 class BasicParser(object):
@@ -27,7 +26,6 @@ class BasicParser(object):
 # chanparser should be able to:
 #   return numbers of all posts
 #   return link(s) to the image(s) and thumbnail(s)
-#   correct post content to match the new image place
-#   return the title of thread (topic or first line, whatever else)
+#   return the title of board
 #   mark post as deleted
-#   add posts from soup object to the end of the thread
+#   add posts to the end of the thread

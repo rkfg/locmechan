@@ -23,6 +23,9 @@ def get():
     if len(sys.argv) < 3:
         print >> sys.stderr, "Insufficient args."
         sys.exit(1)
+
+    # locking to prevent concurrent running. Only for thread sync.
+
     if os.path.isfile('lock.pid'):
         pidfile = open('lock.pid', 'r')
         pid = pidfile.read()
@@ -38,6 +41,8 @@ def get():
     pidfile = open('lock.pid', 'w')
     pidfile.write(str(os.getpid()))
     pidfile.close()
+
+    # loading parsers
     
     for modfile in os.listdir('parsers'):
         if modfile.endswith('.py'):
@@ -61,79 +66,73 @@ def get():
         _threadsfile = open(sys.argv[2], 'r')
         _threads = _threadsfile.read().split()
         _threadsfile.close()
-        _threads = filter(lambda x: x != '', _threads)
+        _threads = filter(lambda x: x != '', _threads) # filter empty lines
     except IOError:
         print >> sys.stderr, "Error opening threads file " + sys.argv[1]
         sys.exit(1)
 
-    # for every thread
-
     deadthreads = set()
+    # for every thread
     for url in _threads:
-
-    #{{{
-    # download thread page
-    # make lxml from the data 
+    # {{{
+        # download thread page
         _activeparser = select_parser(url)
         if _activeparser:
+        # {{{
             print >> sys.stderr, "Checking " + url
             _threadfile = os.path.join("threads", _activeparser.outname)
             if not _activeparser.died:
+            # {{{
                 _toDownload = _activeparser.get_posts_number()
-            # if this thread was already downloaded:
                 output_writer = None
-                if os.path.isfile(_threadfile):
-            #{{{
-                    #    make lxml from it
-                    #    get posts number in it
+                if os.path.isfile(_threadfile): # if this thread was already downloaded
+                # {{{
+                    # get posts number
                     output_writer = Output(_activeparser.outname[:-5], infile = _threadfile)
                     out_nums = set(output_writer.get_posts_number())
                     in_nums = set(_activeparser.get_posts_number())
                     deleted = list(out_nums - in_nums)
-                    #    leave only new posts in _toDownload
+                    # leave only new posts in _toDownload
                     _toDownload = list(in_nums - out_nums)
-                    #    mark deleted posts in _deleted
-                    for post in deleted:
-                        # set deleted marks
+                    for post in deleted: # set deleted marks
                         output_writer.mark_deleted(post)
 
-            #}}}
-                else:
+                else: # create new empty page from template
                     title = _activeparser.get_title()
                     output_writer = Output(_activeparser.outname[:-5], title = title[0], board = title[1])
+                # }}}
 
-                _toDownload.sort(cmp = lambda x,y: int(x) - int(y))
+                _toDownload.sort(cmp = lambda x,y: int(x) - int(y)) # make strict post order
                 postcnt = len(_toDownload) - 1
                 for post in _toDownload:
-            #{{{
+                # {{{
                     print >> sys.stderr, "Adding post #" + post + " (" + str(postcnt) + " left)"
-                    #    get the post from thread
                     newpost = _activeparser.get_post(post)
-                    #    add this post to the end
                     output_writer.add_post(newpost)
-                    #    get images and thumbnails links
                     post_image = _activeparser.get_images(post)
                     if post_image:
-                        #    download images and thumbs
                         print >> sys.stderr, "Downloading image for post..."
                         output_writer.download_images(*post_image)
                     postcnt -= 1
+                # }}}
                     
                 # save the thread
                 output_writer.save(_activeparser.outname)
 
-            #}}}
-
-            else:
+            else: # thread has died
                 deadthreads.add(url)
                 if os.path.isfile(_threadfile): # leave mark that thread died
                     output_writer = Output(_activeparser.outname[:-5], infile = _threadfile)
                     output_writer.add_post({'topic': '', 'date': datetime.datetime.now().strftime("%a %d %b %Y %H:%M:%S"), 'postername': 'locmechan', 'postnumber': '******', 'text': html.fromstring(u'<p style="color: #ff0000; font-style: italic;">Тред умер.</p>')})
                     output_writer.save(_activeparser.outname)
                 print >> sys.stderr, "Thread died: " + url
-        else:
-            print >> sys.stderr, "Unsupported url: " + url
+            # }}}
 
+        else: # no parser for such URL, skipping
+            print >> sys.stderr, "Unsupported url: " + url
+        # }}}
+
+    # sync changes in threadlist, get links, remove dead, save back
     threadfile = open(sys.argv[2], 'r')
     filethreads = set(threadfile.read().split())
     threadfile.close()
