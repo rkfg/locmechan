@@ -99,7 +99,10 @@ def get():
 
                 else: # create new empty page from template
                     title = _activeparser.get_title()
-                    output_writer = Output(_activeparser.outname[:-5], title = title[0], board = title[1])
+                    output_writer = Output(_activeparser.outname[:-5], title = title[0],
+                                           board = title[1])
+                    output_writer.output.xpath('//p[@class="footer"]/a')[0].attrib['href'] = url
+                    
                 # }}}
 
                 _toDownload.sort(cmp = lambda x,y: int(x) - int(y)) # make strict post order
@@ -124,6 +127,7 @@ def get():
                 if os.path.isfile(_threadfile): # leave mark that thread died
                     output_writer = Output(_activeparser.outname[:-5], infile = _threadfile)
                     output_writer.add_post({'topic': '', 'date': datetime.datetime.now().strftime("%a %d %b %Y %H:%M:%S"), 'postername': 'locmechan', 'postnumber': '******', 'text': html.fromstring(u'<p style="color: #ff0000; font-style: italic;">Тред умер.</p>')})
+                    output_writer.output.xpath('//p[@class="footer"]/a')[0].attrib['href'] = '.'
                     output_writer.save(_activeparser.outname)
                 print >> sys.stderr, "Thread died: " + url
             # }}}

@@ -17,7 +17,10 @@ class Parser(BasicParser):
         
         _pathcomp = source.split('/')
         # name of file for saving thread
-        self.outname = "_".join(["tirech", _pathcomp[3], _pathcomp[5]])
+        source = source.replace("http://", "").replace("www", "")
+        self.boardmap = { u"2-ch.ru": [u"tirech", u"Тиреч"], u"iichan.ru": [u"iichan", u"Ычан"] }
+        self.domain = source[:source.find('/')]
+        self.outname = "_".join([self.boardmap[self.domain][0], _pathcomp[3], _pathcomp[5]])
         # the same name without .html (for images/thumbs dirs)
         self.threadnum = _pathcomp[5][:-5]
 
@@ -30,8 +33,11 @@ class Parser(BasicParser):
 
     def get_images(self, postNumber):
         _span = self.source.xpath('//span[@id="exlink_' + postNumber + '"]')
+        if not len(_span):
+            _span = self.source.xpath('//a[@name="' + postNumber + '"]/../a[@target]/..')
+            
         if _span:
-            _link = _span[0].xpath('a')
+            _link = _span[0].xpath('a[@href]')
             if len(_link):
                 _image = _link[0].attrib['href']
                 
@@ -39,19 +45,22 @@ class Parser(BasicParser):
             if len(_img):
                 _thumb = _img[0].attrib['src']
                 
-            return ["http://2-ch.ru" + _image, "http://2-ch.ru" + _thumb]
+            return ["http://" + self.domain + "/" + _image, "http://" + self.domain + "/" + _thumb]
         else:
             return None
 
     def get_title(self):
         _title = self.source.xpath('//title/text()')[0]
-        return [u'Тиреч', _title.replace(u"Два.ч — ", '')]
+        dashpos = _title.find(u" — ")
+        return [self.boardmap[self.domain][1], _title[dashpos + 3:]]
 
     def get_post(self, postNumber):
         result = {}
         _basetag = self.source.xpath('//a[@id="' + postNumber + '"]')
         if not len(_basetag):
-            return None
+            _basetag = self.source.xpath('//a[@name="' + postNumber + '"]')
+            if not len(_basetag):
+                return None
         
         _basetag = _basetag[0]
         result['postnumber'] = postNumber
@@ -65,14 +74,18 @@ class Parser(BasicParser):
         else:
             result['topic'] = ''
         _postername = _basetag.xpath('following-sibling::label/span[@class="postername"]/text()')
-        if len(_postername):
-            result['postername'] = _postername[0]
-        else: # not a text but html with e-mail, possibly SAGE
-            result['postername'] = html.tostring(_basetag.xpath('following-sibling::label/span[@class="postername"]/*')[0], encoding = 'utf-8').decode('utf-8')
-            
+        if not len(_postername):
+            _postername = _basetag.xpath('following-sibling::label/span[@class="commentpostername"]/text()')
+        if not len(_postername):
+            # not a text but html with e-mail, possibly SAGE
+            _postername = [html.tostring(_basetag.xpath('following-sibling::label/span[@class="postername"]/*')[0], encoding = 'utf-8').decode('utf-8')]
+        result['postername'] = _postername[0]
+        
         _date = _basetag.xpath('following-sibling::label/span[@class="postername"]/following-sibling::text()')
-        if len(_date):
-            result['date'] = _date[0].strip()
+        if not len(_date):
+            _date = _basetag.xpath('following-sibling::label/span[@class="commentpostername"]/following-sibling::text()')
+        result['date'] = _date[0].strip()
+            
         _text = _basetag.xpath('following-sibling::blockquote/*')
         if len(_text):
             # fix internal links
@@ -85,6 +98,18 @@ class Parser(BasicParser):
         else:
             result['text'] = ''
 
+        # look for embedded videos
+        _embed = _basetag.xpath('../div/object/embed[@src]')
+        if _embed:
+            _embed = _embed[0]
+            # add it to the beginning of the post
+            if result['text'] == '':
+                result['text'].makeelement('p')
+            _link = _embed.xpath('../..')[0]
+            _link.tail = result['text'].text
+            result['text'].insert(0, _link)
+            result['text'].text = None
+            
         # now get pictures
 
         _links = self.get_images(postNumber)
@@ -97,7 +122,7 @@ class Parser(BasicParser):
             result['image']['full'] = os.path.basename(_links[0])
             result['image']['thumb'] = os.path.basename(_links[1])
             result['image']['size'] = _size[0]
-            
+
         return result
 
 # chanparser should be able to:
@@ -109,7 +134,7 @@ class Parser(BasicParser):
 
 def info():
     # here we return list of links prefix and parser class
-    return [['http://2-ch.ru', 'http://www.2-ch.ru'], Parser]
+    return [['http://2-ch.ru', 'http://www.2-ch.ru', 'http://iichan.ru', 'http://www.iichan.ru'], Parser]
 
 # sorta unit test, lol
 if __name__ == "__main__":
