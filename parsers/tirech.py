@@ -18,7 +18,7 @@ class Parser(BasicParser):
         _pathcomp = source.split('/')
         # name of file for saving thread
         source = source.replace("http://", "").replace("www", "")
-        self.boardmap = { u"2-ch.ru": [u"tirech", u"Тиреч"], u"iichan.ru": [u"iichan", u"Ычан"] }
+        self.boardmap = {u"2-ch.ru": [u"tirech", u"Тиреч"], u"iichan.ru": [u"iichan", u"Ычан"], u"uchan.org.ua": [u"uchan", u"Учан"]}
         self.domain = source[:source.find('/')]
         self.outname = "_".join([self.boardmap[self.domain][0], _pathcomp[3], _pathcomp[5]])
         # the same name without .html (for images/thumbs dirs)
@@ -27,7 +27,7 @@ class Parser(BasicParser):
     def get_posts_number(self):
         _reflinks = self.source.xpath('//span[@class="reflink"]/a/text()')
         if _reflinks:
-            return [link[1:] for link in _reflinks]
+            return [link.replace(u"№", "").replace("No.", "") for link in _reflinks]
         else:
             return None
 
@@ -52,7 +52,10 @@ class Parser(BasicParser):
     def get_title(self):
         _title = self.source.xpath('//title/text()')[0]
         dashpos = _title.find(u" — ")
-        return [self.boardmap[self.domain][1], _title[dashpos + 3:]]
+        if dashpos < 0: # uchan
+            return [self.boardmap[self.domain][1], _title[_title.rfind("/") + 4:_title.rfind(" - ")]]
+        else:
+            return [self.boardmap[self.domain][1], _title[dashpos + 3:]]
 
     def get_post(self, postNumber):
         result = {}
@@ -88,13 +91,17 @@ class Parser(BasicParser):
             
         _text = _basetag.xpath('following-sibling::blockquote/*')
         if len(_text):
+            textsum = ''
+            for e in _text:
+                textsum += html.tostring(e, encoding = 'utf-8').decode('utf-8')
+            _text = html.fromstring(textsum)
             # fix internal links
-            intlinks = _text[0].xpath('//a[starts-with(@onclick,"highlight")]')
+            intlinks = _text.xpath('//a[starts-with(@onclick,"highlight")]')
             if intlinks:
                 for a in intlinks:
                     a.attrib['href'] = a.attrib['href'][a.attrib['href'].rfind('#'):]
                     
-            result['text'] = _text[0]
+            result['text'] = _text
         else:
             result['text'] = ''
 
@@ -134,7 +141,7 @@ class Parser(BasicParser):
 
 def info():
     # here we return list of links prefix and parser class
-    return [['http://2-ch.ru', 'http://www.2-ch.ru', 'http://iichan.ru', 'http://www.iichan.ru'], Parser]
+    return [['http://2-ch.ru', 'http://www.2-ch.ru', 'http://iichan.ru', 'http://www.iichan.ru', 'http://uchan.org.ua'], Parser]
 
 # sorta unit test, lol
 if __name__ == "__main__":

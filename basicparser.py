@@ -1,13 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from lxml import html
+from lxml import html, etree
+import urllib2
+import httplib
 
 class BasicParser(object):
 
     def __init__(self, source):
-        self.source = html.parse(source)
-
+        try:
+            url = urllib2.urlopen(source) # this is to fix broken unicode on 
+            page = url.read().decode('utf-8', 'ignore') # some ukrainian chans (oh SO SNOOLEY!)
+            url.close()
+            self.source = html.fromstring(page)
+        except urllib2.HTTPError:
+            raise IOError("failed to load HTTP resource")
+        except httplib.BadStatusLine:
+            print >> sys.stderr, "BadStatusLine!"
+        except httplib.IncompleteRead:
+            print >> sys.stderr, "IncompleteRead!"
+        
     def get_posts_number(self):
         pass
 

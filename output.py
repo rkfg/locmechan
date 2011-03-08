@@ -5,6 +5,7 @@ import os
 import sys
 from lxml import html
 import urllib2
+import httplib
 
 class MalformedPostError(Exception):
     pass
@@ -110,6 +111,11 @@ class Output:
             thumbfile.close()
         except urllib2.HTTPError:
             print >> sys.stderr, "Not found!"
+        except httplib.BadStatusLine:
+            print >> sys.stderr, "BadStatusLine!"
+        except httplib.IncompleteRead:
+            print >> sys.stderr, "IncompleteRead!"
+            
 
     def get_posts_number(self):
         _reflinks = self.output.xpath('//span[@class="reflink"]/a/text()')
