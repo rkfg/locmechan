@@ -8,6 +8,7 @@ from lxml import html
 import imp
 import datetime
 import shutil
+import socket
 
 parsers = []
 
@@ -244,6 +245,8 @@ del <threads/some_thread.html> - delete thread, its aliases, pics'n'thumbs
 """
         
 commands = {'get': get, 'lsa': list_aliases, 'lsna': list_not_aliased, 'a': add_alias, 'help': help, 'del': delete_thread}
+
+socket.setdefaulttimeout(30)
 
 if len(sys.argv) < 2:
     commands['help']()
