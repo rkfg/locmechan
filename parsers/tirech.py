@@ -68,20 +68,15 @@ class Parser(BasicParser):
         _basetag = _basetag[0]
         result['postnumber'] = postNumber
         # title of reply
-        _topic = _basetag.xpath('following-sibling::label/span[@class="replytitle"]/text()')
-        if not len(_topic):
-            # maybe it's OP post?
-            _topic = _basetag.xpath('following-sibling::label/span[@class="filetitle"]/text()')
+        _topic = _basetag.xpath('following-sibling::label/span[re:match(@class, "(reply|file)title")]/text()', namespaces={"re": "http://exslt.org/regular-expressions"})
         if len (_topic):
             result['topic'] = _topic[0]
         else:
             result['topic'] = ''
-        _postername = _basetag.xpath('following-sibling::label/span[@class="postername"]/text()')
-        if not len(_postername):
-            _postername = _basetag.xpath('following-sibling::label/span[@class="commentpostername"]/text()')
+        _postername = _basetag.xpath('following-sibling::label/span[@class=re:match(@class, ".*postername$")]/text()', namespaces={"re": "http://exslt.org/regular-expressions"})
         if not len(_postername):
             # not a text but html with e-mail, possibly SAGE
-             _span = _basetag.xpath('following-sibling::label/span[@class="postername"]/*')
+             _span = _basetag.xpath('following-sibling::label/span[@class=re:match(@class, ".*postername$")]/*', namespaces={"re": "http://exslt.org/regular-expressions"})
              if len(_span):
                  _postername = [html.tostring(_span[0], encoding = 'utf-8').decode('utf-8')]
              else:
@@ -89,9 +84,7 @@ class Parser(BasicParser):
                  
         result['postername'] = _postername[0]
         
-        _date = _basetag.xpath('following-sibling::label/span[@class="postername"]/following-sibling::text()')
-        if not len(_date):
-            _date = _basetag.xpath('following-sibling::label/span[@class="commentpostername"]/following-sibling::text()')
+        _date = _basetag.xpath('following-sibling::label/span[re:match(@class, ".*postername$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
         result['date'] = _date[0].strip()
             
         _text = _basetag.xpath('following-sibling::blockquote/*')
