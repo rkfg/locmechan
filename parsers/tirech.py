@@ -18,7 +18,8 @@ class Parser(BasicParser):
         _pathcomp = source.split('/')
         # name of file for saving thread
         source = source.replace("http://", "").replace("www", "")
-        self.boardmap = {u"2-ch.ru": [u"tirech", u"Тиреч"], u"iichan.ru": [u"iichan", u"Ычан"], u"uchan.org.ua": [u"uchan", u"Учан"]}
+        self.boardmap = {u"2-ch.ru": [u"tirech", u"Тиреч"], u"iichan.ru": [u"iichan", u"Ычан"], u"uchan.org.ua": [u"uchan", u"Учан"], u"2--ch.ru": [u"longtirech", u"Длиннотиреч"]}
+        
         self.domain = source[:source.find('/')]
         self.outname = "_".join([self.boardmap[self.domain][0], _pathcomp[3], _pathcomp[5]])
         # the same name without .html (for images/thumbs dirs)
@@ -32,7 +33,7 @@ class Parser(BasicParser):
             return None
 
     def get_images(self, postNumber):
-        _span = self.source.xpath('//span[@id="exlink_' + postNumber + '"]')
+        _span = self.source.xpath('//span[re:match(@id, ".*_' + postNumber + '$")]', namespaces={"re": "http://exslt.org/regular-expressions"})
         if not len(_span):
             _span = self.source.xpath('//a[@name="' + postNumber + '"]/../a[@target]/..')
             
@@ -139,7 +140,7 @@ class Parser(BasicParser):
 
 def info():
     # here we return list of links prefix and parser class
-    return [['http://2-ch.ru', 'http://www.2-ch.ru', 'http://iichan.ru', 'http://www.iichan.ru', 'http://uchan.org.ua'], Parser]
+    return [['http://2-ch.ru', 'http://www.2-ch.ru', 'http://2--ch.ru', 'http://www.2--ch.ru', 'http://iichan.ru', 'http://www.iichan.ru', 'http://uchan.org.ua'], Parser]
 
 # sorta unit test, lol
 if __name__ == "__main__":
