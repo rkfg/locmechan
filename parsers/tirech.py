@@ -81,7 +81,12 @@ class Parser(BasicParser):
             _postername = _basetag.xpath('following-sibling::label/span[@class="commentpostername"]/text()')
         if not len(_postername):
             # not a text but html with e-mail, possibly SAGE
-            _postername = [html.tostring(_basetag.xpath('following-sibling::label/span[@class="postername"]/*')[0], encoding = 'utf-8').decode('utf-8')]
+             _span = _basetag.xpath('following-sibling::label/span[@class="postername"]/*')
+             if len(_span):
+                 _postername = [html.tostring(_span[0], encoding = 'utf-8').decode('utf-8')]
+             else:
+                 _postername = [u"Аноним"]
+                 
         result['postername'] = _postername[0]
         
         _date = _basetag.xpath('following-sibling::label/span[@class="postername"]/following-sibling::text()')
