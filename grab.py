@@ -199,6 +199,10 @@ def add_alias():
         print >> sys.stderr, "First argument isn't thread filename."
         sys.exit(1)
 
+    if not sys.argv[2].startswith('threads/'):
+        print "Use only 'threads/filename.html' for aliasing."
+        return
+    
     try:
         if not os.path.isdir("aliases"):
             os.mkdir("aliases")
@@ -229,6 +233,10 @@ def delete_thread():
         print "Thread doesn't exist!"
         return
 
+    if not sys.argv[2].startswith('threads/'):
+        print "Use only 'threads/filename.html' for deleting."
+        return
+    
     aliases = get_aliases()
     alias = filter(lambda x: x[1] == os.path.basename(sys.argv[2]), aliases)
     if alias:
@@ -252,6 +260,10 @@ def export_thread():
         print "Thread doesn't exist!"
         return
 
+    if not sys.argv[2].startswith('threads/'):
+        print "Use only 'threads/filename.html' for exporting."
+        return
+
     alias = get_alias(sys.argv[2])
     if not alias:
         alias = os.path.basename(sys.argv[2])[:-5]
@@ -263,10 +275,10 @@ def export_thread():
         
     os.symlink('..', os.path.join('arch', alias))
     images_dir, thumbs_dir = get_image_dirs(sys.argv[2])
-    dirlist = map(lambda x: alias + "/" + x, [sys.argv[2], images_dir, thumbs_dir, 'templates/photon_files/*'])
+    dirlist = map(lambda x: '"' + alias + "/" + x + '"', [sys.argv[2], images_dir, thumbs_dir])
+    dirlist.append('"' + alias + '/' + 'templates/photon_files"/*')
     os.chdir('arch')
     cmdline = 'tar zcvf "' + alias + '.tar.gz" ' + ' '.join(dirlist)
-    #print cmdline
     os.system(cmdline.encode('utf-8'))
     try:
         os.unlink(alias)
@@ -277,8 +289,8 @@ def import_thread():
     if not os.path.isfile(sys.argv[2]):
         print "File doesn't exist!"
         return
-    cmdline = 'tar --strip-components=1 --exclude=*/templates -xvf ' + sys.argv[2]
-    os.system(cmdline.encode('utf-8'))
+    cmdline = 'tar --strip-components=1 --exclude=*/templates -xvf "' + sys.argv[2] + '"'
+    os.system(cmdline)
         
 def help():
     print """LocmeChan - imageboard threads keeping engine.
