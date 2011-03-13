@@ -158,9 +158,17 @@ def get_aliases():
     result = []
     aliases = filter(lambda x: x.endswith(".html"), os.listdir("aliases"))
     for alias in aliases:
-        result.append([alias.decode('utf-8'), os.path.basename(os.readlink(os.path.join("aliases", alias)))])
+        result.append((alias.decode('utf-8'), os.path.basename(os.readlink(os.path.join("aliases", alias)))))
         
     return result
+
+def get_alias(thread):
+    thread = os.path.basename(thread)
+    aliases = get_aliases()
+    for alias in aliases:
+        if alias[1] == thread:
+            return alias[0][:-5]
+    return None
 
 def list_aliases():
     aliases = get_aliases()
@@ -206,6 +214,12 @@ def add_alias():
     else:
         print "Alias created."
 
+def get_image_dirs(thread):
+    threadnumber = os.path.basename(thread)[:-5]
+    images_dir = os.path.join("threads/images", threadnumber)
+    thumbs_dir = os.path.join("threads/thumbs", threadnumber)
+    return (images_dir, thumbs_dir)
+        
 def delete_thread():
     if len(sys.argv) < 3:
         print "Insufficient args, need path to the thread to delete"
@@ -220,9 +234,7 @@ def delete_thread():
     if alias:
         for a in alias:
             os.unlink(os.path.join("aliases", a[0]))
-    threadnumber = os.path.basename(sys.argv[2])[:-5]
-    images_dir = os.path.join("threads/images", threadnumber)
-    thumbs_dir = os.path.join("threads/thumbs", threadnumber)
+    images_dir, thumbs_dir = get_image_dirs(sys.argv[2])
     os.unlink(sys.argv[2])
     try:
         shutil.rmtree(images_dir)
@@ -231,6 +243,42 @@ def delete_thread():
         pass
     
     print "Thread deleted."
+
+def export_thread():
+    if not os.path.isdir("arch"):
+        os.mkdir("arch")
+
+    if not os.path.isfile(sys.argv[2]):
+        print "Thread doesn't exist!"
+        return
+
+    alias = get_alias(sys.argv[2])
+    if not alias:
+        alias = os.path.basename(sys.argv[2])[:-5]
+
+    try:
+        os.unlink(os.path.join('arch', alias))
+    except:
+        pass
+        
+    os.symlink('..', os.path.join('arch', alias))
+    images_dir, thumbs_dir = get_image_dirs(sys.argv[2])
+    dirlist = map(lambda x: alias + "/" + x, [sys.argv[2], images_dir, thumbs_dir, 'templates/photon_files/*'])
+    os.chdir('arch')
+    cmdline = 'tar zcvf "' + alias + '.tar.gz" ' + ' '.join(dirlist)
+    #print cmdline
+    os.system(cmdline.encode('utf-8'))
+    try:
+        os.unlink(alias)
+    except:
+        pass
+
+def import_thread():
+    if not os.path.isfile(sys.argv[2]):
+        print "File doesn't exist!"
+        return
+    cmdline = 'tar --strip-components=1 --exclude=*/templates -xvf ' + sys.argv[2]
+    os.system(cmdline.encode('utf-8'))
         
 def help():
     print """LocmeChan - imageboard threads keeping engine.
@@ -242,9 +290,11 @@ lsa - list threads aliases.
 lsna - list not aliased threads. Alias them now!
 a <threads/some_thread.html> <"new alias"> - add thread alias.
 del <threads/some_thread.html> - delete thread, its aliases, pics'n'thumbs
+e <threads/some_thread.html> - export thread and all related files to arch/threadname.tar.gz
+i <some_file> - import thread from some_file
 """
         
-commands = {'get': get, 'lsa': list_aliases, 'lsna': list_not_aliased, 'a': add_alias, 'help': help, 'del': delete_thread}
+commands = {'get': get, 'lsa': list_aliases, 'lsna': list_not_aliased, 'a': add_alias, 'help': help, 'del': delete_thread, 'e': export_thread, 'i': import_thread}
 
 socket.setdefaulttimeout(30)
 
