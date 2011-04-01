@@ -18,12 +18,16 @@ class Parser(BasicParser):
         _pathcomp = source.split('/')
         # name of file for saving thread
         source = source.replace("http://", "").replace("www", "")
-        self.boardmap = {u"2-ch.ru": [u"tirech", u"Тиреч"], u"iichan.ru": [u"iichan", u"Ычан"], u"uchan.org.ua": [u"uchan", u"Учан"], u"2--ch.ru": [u"longtirech", u"Длиннотиреч"]}
+        self.boardmap = {u"2-ch.ru": [u"tirech", u"Тиреч"], u"2ch.so": [u"pirach", u"Пирач"], u"iichan.ru": [u"iichan", u"Ычан"], u"uchan.org.ua": [u"uchan", u"Учан"], u"2--ch.ru": [u"longtirech", u"Длиннотиреч"]}
         
         self.domain = source[:source.find('/')]
-        self.outname = "_".join([self.boardmap[self.domain][0], _pathcomp[3], _pathcomp[5]])
+        if _pathcomp[4] == "arch":
+            tindex = 6
+        else:
+            tindex = 5
+        self.outname = "_".join([self.boardmap[self.domain][0], _pathcomp[3], _pathcomp[tindex]])
         # the same name without .html (for images/thumbs dirs)
-        self.threadnum = _pathcomp[5][:-5]
+        self.threadnum = _pathcomp[tindex][:-5]
 
     def get_posts_number(self):
         _reflinks = self.source.xpath('//span[@class="reflink"]/a/text()')
@@ -140,7 +144,7 @@ class Parser(BasicParser):
 
 def info():
     # here we return list of links prefix and parser class
-    return [['http://2-ch.ru', 'http://www.2-ch.ru', 'http://2--ch.ru', 'http://www.2--ch.ru', 'http://iichan.ru', 'http://www.iichan.ru', 'http://uchan.org.ua'], Parser]
+    return [['http://2-ch.ru', 'http://www.2-ch.ru', 'http://2ch.so', 'http://www.2ch.so', 'http://2--ch.ru', 'http://www.2--ch.ru', 'http://iichan.ru', 'http://www.iichan.ru', 'http://uchan.org.ua'], Parser]
 
 # sorta unit test, lol
 if __name__ == "__main__":

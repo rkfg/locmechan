@@ -111,7 +111,7 @@ def get():
                 if postcnt == -1:
 		  print >> sys.stderr, "- no updates"
 		else:
-		  print >> sys.stderr, "- %d new posts" % postcnt + 1
+		  print >> sys.stderr, "- %d new posts" % (postcnt + 1)
                 for post in _toDownload:
                 # {{{
                     print >> sys.stderr, "Adding post #" + post + " (" + str(postcnt) + " left)"
