@@ -6,6 +6,7 @@ import sys
 from lxml import html
 import urllib2
 import httplib
+import socket
 
 class MalformedPostError(Exception):
     pass
@@ -99,18 +100,22 @@ class Output:
 
         try:
             link = urllib2.urlopen(image)
+            socket.setdefaulttimeout(30)
             imgfile = open(os.path.join(imagepath, os.path.basename(image)), 'w')
             imgfile.write(link.read())
             link.close()
             imgfile.close()
 
             link = urllib2.urlopen(thumb)
+            socket.setdefaulttimeout(30)
             thumbfile = open(os.path.join(thumbpath, os.path.basename(thumb)), 'w')
             thumbfile.write(link.read())
             link.close()
             thumbfile.close()
         except urllib2.HTTPError:
             print >> sys.stderr, "Not found!"
+        except urllib2.URLError, e:
+            print >> sys.stderr, "URL error happened, possibly DNS issue:", e
         except httplib.BadStatusLine:
             print >> sys.stderr, "BadStatusLine!"
         except httplib.IncompleteRead:

@@ -80,7 +80,7 @@ def get():
         _activeparser = select_parser(url)
         if _activeparser:
         # {{{
-            print >> sys.stderr, "Checking " + url
+            print >> sys.stderr, "Checking " + url,
             _threadfile = os.path.join("threads", _activeparser.outname)
             if not _activeparser.died:
             # {{{
@@ -108,6 +108,10 @@ def get():
 
                 _toDownload.sort(cmp = lambda x,y: int(x) - int(y)) # make strict post order
                 postcnt = len(_toDownload) - 1
+                if postcnt == -1:
+		  print >> sys.stderr, "- no updates"
+		else:
+		  print >> sys.stderr, "- %d new posts" % postcnt + 1
                 for post in _toDownload:
                 # {{{
                     print >> sys.stderr, "Adding post #" + post + " (" + str(postcnt) + " left)"

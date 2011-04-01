@@ -110,7 +110,7 @@ class Parser(BasicParser):
             _embed = _embed[0]
             # add it to the beginning of the post
             if result['text'] == '':
-                result['text'].makeelement('p')
+                result['text'] = html.fromstring('<p></p>')
             _link = _embed.xpath('../..')[0]
             _link.tail = result['text'].text
             result['text'].insert(0, _link)

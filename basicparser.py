@@ -4,11 +4,13 @@
 from lxml import html, etree
 import urllib2
 import httplib
+import socket
 
 class BasicParser(object):
 
     def __init__(self, source):
         try:
+            socket.setdefaulttimeout(30)
             url = urllib2.urlopen(source) # this is to fix broken unicode on 
             page = url.read().decode('utf-8', 'ignore') # some ukrainian chans (oh SO SNOOLEY!)
             url.close()
