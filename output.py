@@ -112,10 +112,13 @@ class Output:
             thumbfile.write(link.read())
             link.close()
             thumbfile.close()
-        except urllib2.HTTPError:
-            print >> sys.stderr, "Not found!"
+        except urllib2.HTTPError, e:
+            if e.code == 404:
+                print >> sys.stderr, "Not found!"
+            else:
+                print >> sys.stderr, "HTTP Error:", e.code
         except urllib2.URLError, e:
-            print >> sys.stderr, "URL error happened, possibly DNS issue:", e
+            print >> sys.stderr, "URL error happened, possibly DNS issue:", str(e)
         except httplib.BadStatusLine:
             print >> sys.stderr, "BadStatusLine!"
         except httplib.IncompleteRead:

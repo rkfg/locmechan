@@ -134,7 +134,7 @@ def get():
                     output_writer.add_post({'topic': '', 'date': datetime.datetime.now().strftime("%a %d %b %Y %H:%M:%S"), 'postername': 'locmechan', 'postnumber': '******', 'text': html.fromstring(u'<p style="color: #ff0000; font-style: italic;">Тред умер.</p>')})
                     output_writer.output.xpath('//p[@class="footer"]/a')[0].attrib['href'] = '.'
                     output_writer.save(_activeparser.outname)
-                print >> sys.stderr, "Thread died: " + url
+                print >> sys.stderr, " - thread died."
             # }}}
 
         else: # no parser for such URL, skipping

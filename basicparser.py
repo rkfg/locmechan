@@ -15,8 +15,8 @@ class BasicParser(object):
             page = url.read().decode('utf-8', 'ignore') # some ukrainian chans (oh SO SNOOLEY!)
             url.close()
             self.source = html.fromstring(page)
-        except urllib2.HTTPError:
-            raise IOError("failed to load HTTP resource")
+        except urllib2.HTTPError, e:
+            raise e
         except httplib.BadStatusLine:
             print >> sys.stderr, "BadStatusLine!"
         except httplib.IncompleteRead:
