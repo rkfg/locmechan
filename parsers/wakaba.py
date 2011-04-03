@@ -88,8 +88,10 @@ class Parser(BasicParser):
                  _postername = [u"Аноним"]
                  
         result['postername'] = _postername[0]
-        
-        _date = _basetag.xpath('following-sibling::label/span[re:match(@class, ".*postername$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
+        if len(_basetag.xpath('following-sibling::label/span[re:match(@class, ".*postertrip$")]', namespaces={"re": "http://exslt.org/regular-expressions"})):
+            _date = _basetag.xpath('following-sibling::label/span[re:match(@class, ".*postertrip$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
+        else:
+            _date = _basetag.xpath('following-sibling::label/span[re:match(@class, ".*postername$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
         result['date'] = _date[0].strip()
             
         _text = _basetag.xpath('following-sibling::blockquote/*')
