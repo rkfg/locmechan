@@ -99,14 +99,14 @@ class Output:
             os.makedirs(thumbpath)
 
         try:
-            link = urllib2.urlopen(image)
+            link = urllib2.urlopen(image.encode('utf-8'))
             socket.setdefaulttimeout(30)
             imgfile = open(os.path.join(imagepath, os.path.basename(image)), 'w')
             imgfile.write(link.read())
             link.close()
             imgfile.close()
 
-            link = urllib2.urlopen(thumb)
+            link = urllib2.urlopen(thumb.encode('utf-8'))
             socket.setdefaulttimeout(30)
             thumbfile = open(os.path.join(thumbpath, os.path.basename(thumb)), 'w')
             thumbfile.write(link.read())
