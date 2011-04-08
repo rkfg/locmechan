@@ -12,7 +12,7 @@ class Parser(BasicParser):
         try:
             super(Parser, self).__init__(source)
         except IOError, c:
-            if "failed to load HTTP resource" in str(c):
+            if c.code == 404:
                 self.died = True
         
         _pathcomp = source.split('/')
