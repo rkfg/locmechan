@@ -11,7 +11,7 @@ class Parser(BasicParser):
         self.died = False
         try:
             super(Parser, self).__init__(source)
-        except IOError, c:
+        except urllib2.HTTPError, c:
             if c.code == 404:
                 self.died = True
         
