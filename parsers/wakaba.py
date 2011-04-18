@@ -4,6 +4,7 @@
 import os
 from basicparser import BasicParser
 from lxml import html
+import urllib2
 
 class Parser(BasicParser):
 
