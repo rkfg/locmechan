@@ -9,6 +9,7 @@ import imp
 import datetime
 import shutil
 import socket
+import time
 
 parsers = []
 
@@ -120,7 +121,15 @@ def get():
                     post_image = _activeparser.get_images(post)
                     if post_image:
                         print >> sys.stderr, "Downloading image for post..."
-                        output_writer.download_images(*post_image)
+                        retry = 5
+                        while retry:
+                            try:
+                                output_writer.download_images(*post_image)
+                                retry = 0
+                            except:
+                                time.sleep(3)
+                                retry -= 1
+                            
                     postcnt -= 1
                 # }}}
                     

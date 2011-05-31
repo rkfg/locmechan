@@ -129,7 +129,9 @@ class Parser(BasicParser):
             _size = _basetag.xpath('following-sibling::span[@class="filesize"]/em/text()')
             if not len(_size):
                 _size = _basetag.xpath('preceding-sibling::span[@class="filesize"]/em/text()')
-                
+                if not len(_size):
+                    _size = _basetag.xpath('preceding-sibling::span[@class="filesize"]/span[@class="filesize"]/em/text()')
+
             result['image'] = {}
             result['image']['full'] = os.path.basename(_links[0])
             result['image']['thumb'] = os.path.basename(_links[1])
