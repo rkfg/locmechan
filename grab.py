@@ -86,6 +86,9 @@ def get():
             if not _activeparser.died:
             # {{{
                 _toDownload = _activeparser.get_posts_number()
+                if not _toDownload:
+                    print >> sys.stderr, "- no posts numbers found, strange..."
+                    break;
                 output_writer = None
                 if os.path.isfile(_threadfile): # if this thread was already downloaded
                 # {{{
