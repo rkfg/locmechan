@@ -17,6 +17,7 @@ class Parser(BasicParser):
                 self.died = True
 
         err404 = self.source.xpath('//div[@class="wellcome"]/text()') # blame you, macaque!
+
         if len(err404) and u"404 - Ничего не найдено." in err404[0]:
             self.died = True
             

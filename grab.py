@@ -4,6 +4,7 @@
 import os
 import sys
 from output import Output
+from basicparser import ThreadIsntAccessible
 from lxml import html
 import imp
 import datetime
@@ -77,81 +78,84 @@ def get():
     # for every thread
     for url in _threads:
     # {{{
-        # download thread page
-        _activeparser = select_parser(url)
-        if _activeparser:
-        # {{{
-            print >> sys.stderr, "Checking " + url,
-            _threadfile = os.path.join("threads", _activeparser.outname)
-            if not _activeparser.died:
+        try:
+            # download thread page
+            _activeparser = select_parser(url)
+            if _activeparser:
+                # {{{
+                print >> sys.stderr, "Checking " + url,
+                _threadfile = os.path.join("threads", _activeparser.outname)
+                if not _activeparser.died:
             # {{{
-                _toDownload = _activeparser.get_posts_number()
-                if not _toDownload:
-                    print >> sys.stderr, "- no posts numbers found, strange..."
-                    break;
-                output_writer = None
-                if os.path.isfile(_threadfile): # if this thread was already downloaded
-                # {{{
-                    # get posts number
-                    output_writer = Output(_activeparser.outname[:-5], infile = _threadfile)
-                    out_nums = set(output_writer.get_posts_number())
-                    in_nums = set(_activeparser.get_posts_number())
-                    deleted = list(out_nums - in_nums)
-                    # leave only new posts in _toDownload
-                    _toDownload = list(in_nums - out_nums)
-                    for post in deleted: # set deleted marks
-                        output_writer.mark_deleted(post)
+                    _toDownload = _activeparser.get_posts_number()
+                    if not _toDownload:
+                        print >> sys.stderr, "- no posts numbers found, strange..."
+                        break;
+                    output_writer = None
+                    if os.path.isfile(_threadfile): # if this thread was already downloaded
+                        # {{{
+                        # get posts number
+                        output_writer = Output(_activeparser.outname[:-5], infile = _threadfile)
+                        out_nums = set(output_writer.get_posts_number())
+                        in_nums = set(_activeparser.get_posts_number())
+                        deleted = list(out_nums - in_nums)
+                        # leave only new posts in _toDownload
+                        _toDownload = list(in_nums - out_nums)
+                        for post in deleted: # set deleted marks
+                            output_writer.mark_deleted(post)
 
-                else: # create new empty page from template
-                    title = _activeparser.get_title()
-                    output_writer = Output(_activeparser.outname[:-5], title = title[0],
-                                           board = title[1])
-                    output_writer.output.xpath('//p[@class="footer"]/a')[0].attrib['href'] = url
+                    else: # create new empty page from template
+                        title = _activeparser.get_title()
+                        output_writer = Output(_activeparser.outname[:-5], title = title[0],
+                                               board = title[1])
+                        output_writer.output.xpath('//p[@class="footer"]/a')[0].attrib['href'] = url
                     
-                # }}}
+                    # }}}
 
-                _toDownload.sort(cmp = lambda x,y: int(x) - int(y)) # make strict post order
-                postcnt = len(_toDownload) - 1
-                if postcnt == -1:
-		  print >> sys.stderr, "- no updates"
-		else:
-		  print >> sys.stderr, "- %d new posts" % (postcnt + 1)
-                for post in _toDownload:
-                # {{{
-                    print >> sys.stderr, "Adding post #" + post + " (" + str(postcnt) + " left)"
-                    newpost = _activeparser.get_post(post)
-                    output_writer.add_post(newpost)
-                    post_image = _activeparser.get_images(post)
-                    if post_image:
-                        print >> sys.stderr, "Downloading image for post..."
-                        retry = 5
-                        while retry:
-                            try:
-                                output_writer.download_images(*post_image)
-                                retry = 0
-                            except:
-                                time.sleep(3)
-                                retry -= 1
+                    _toDownload.sort(cmp = lambda x,y: int(x) - int(y)) # make strict post order
+                    postcnt = len(_toDownload) - 1
+                    if postcnt == -1:
+                        print >> sys.stderr, "- no updates"
+                    else:
+                        print >> sys.stderr, "- %d new posts" % (postcnt + 1)
+                    for post in _toDownload:
+                        # {{{
+                        print >> sys.stderr, "Adding post #" + post + " (" + str(postcnt) + " left)"
+                        newpost = _activeparser.get_post(post)
+                        output_writer.add_post(newpost)
+                        post_image = _activeparser.get_images(post)
+                        if post_image:
+                            print >> sys.stderr, "Downloading image for post..."
+                            retry = 5
+                            while retry:
+                                try:
+                                    output_writer.download_images(*post_image)
+                                    retry = 0
+                                except:
+                                    time.sleep(3)
+                                    retry -= 1
                             
-                    postcnt -= 1
-                # }}}
+                        postcnt -= 1
+                    # }}}
                     
-                # save the thread
-                output_writer.save(_activeparser.outname)
-
-            else: # thread has died
-                deadthreads.add(url)
-                if os.path.isfile(_threadfile): # leave mark that thread died
-                    output_writer = Output(_activeparser.outname[:-5], infile = _threadfile)
-                    output_writer.add_post({'topic': '', 'date': datetime.datetime.now().strftime("%a %d %b %Y %H:%M:%S"), 'postername': 'locmechan', 'postnumber': '******', 'text': html.fromstring(u'<p style="color: #ff0000; font-style: italic;">Тред умер.</p>')})
-                    output_writer.output.xpath('//p[@class="footer"]/a')[0].attrib['href'] = '.'
+                    # save the thread
                     output_writer.save(_activeparser.outname)
-                print >> sys.stderr, " - thread died."
-            # }}}
 
-        else: # no parser for such URL, skipping
-            print >> sys.stderr, "Unsupported url: " + url
-        # }}}
+                else: # thread has died
+                    deadthreads.add(url)
+                    if os.path.isfile(_threadfile): # leave mark that thread died
+                        output_writer = Output(_activeparser.outname[:-5], infile = _threadfile)
+                        output_writer.add_post({'topic': '', 'date': datetime.datetime.now().strftime("%a %d %b %Y %H:%M:%S"), 'postername': 'locmechan', 'postnumber': '******', 'text': html.fromstring(u'<p style="color: #ff0000; font-style: italic;">Тред умер.</p>')})
+                        output_writer.output.xpath('//p[@class="footer"]/a')[0].attrib['href'] = '.'
+                        output_writer.save(_activeparser.outname)
+                    print >> sys.stderr, " - thread died."
+                # }}}
+
+            else: # no parser for such URL, skipping
+                print >> sys.stderr, "Unsupported url: " + url
+            # }}}
+        except ThreadIsntAccessible:
+            print >> sys.stderr, " - thread isn't accessible now due to server errors"
 
     # sync changes in threadlist, get links, remove dead, save back
     threadfile = open(sys.argv[2], 'r')
