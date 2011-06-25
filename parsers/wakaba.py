@@ -16,10 +16,11 @@ class Parser(BasicParser):
             if c.code == 404:
                 self.died = True
 
-        err404 = self.source.xpath('//div[@class="wellcome"]/text()') # blame you, macaque!
+        if not self.died:
+            err404 = self.source.xpath('//div[@class="wellcome"]/text()') # blame you, macaque!
 
-        if len(err404) and u"404 - Ничего не найдено." in err404[0]:
-            self.died = True
+            if len(err404) and u"404 - Ничего не найдено." in err404[0]:
+                self.died = True
             
         _pathcomp = source.split('/')
         # name of file for saving thread
