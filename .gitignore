@@ -1,7 +1,5 @@
 *~
-/threads
-/arch
-/aliases
+threads
+arch
+aliases
 *.pyc
-/grab
-/list
