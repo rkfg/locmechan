@@ -75,8 +75,10 @@ class Parser(BasicParser):
         if not len(_basetag):
             _basetag = self.source.xpath('//a[@name="' + postNumber + '"]')
             if not len(_basetag):
-                return None
-        
+                _basetag = self.source.xpath('//td[@id= + postNumber + ]')
+                if not len(_basetag):
+                    return None
+         
         _basetag = _basetag[0]
         result['postnumber'] = postNumber
         # title of reply
@@ -99,6 +101,8 @@ class Parser(BasicParser):
             _date = _basetag.xpath('following-sibling::label/span[re:match(@class, ".*postertrip$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
         elif len(_basetag.xpath('following-sibling::label/span[re:match(@class, ".*postername$")]', namespaces={"re": "http://exslt.org/regular-expressions"})):
             _date = _basetag.xpath('following-sibling::label/span[re:match(@class, ".*postername$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
+        elif len(_basetag.xpath('//label/span[re:match(@class, ".*postername$")]', namespaces={"re": "http://exslt.org/regular-expressions"})):
+            _date = _basetag.xpath('//label/span[re:match(@class, ".*postername$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
         else:
             _date = _basetag.xpath('following-sibling::label/span[re:match(@class, ".*replytitle$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
         result['date'] = _date[0].strip()
