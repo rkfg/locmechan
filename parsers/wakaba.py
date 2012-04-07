@@ -108,6 +108,8 @@ class Parser(BasicParser):
         result['date'] = _date[0].strip()
             
         _text = _basetag.xpath('following-sibling::blockquote/*')
+        if not len(_text):
+            _text = _basetag.xpath('child::blockquote/*')
         if len(_text):
             textsum = ''
             for e in _text:
