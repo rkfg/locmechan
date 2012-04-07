@@ -75,7 +75,7 @@ class Parser(BasicParser):
         if not len(_basetag):
             _basetag = self.source.xpath('//a[@name="' + postNumber + '"]')
             if not len(_basetag):
-                _basetag = self.source.xpath('//td[@id= + postNumber + ]')
+                _basetag = self.source.xpath('//td[@id="' + postNumber + '"]')
                 if not len(_basetag):
                     return None
          
@@ -101,8 +101,8 @@ class Parser(BasicParser):
             _date = _basetag.xpath('following-sibling::label/span[re:match(@class, ".*postertrip$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
         elif len(_basetag.xpath('following-sibling::label/span[re:match(@class, ".*postername$")]', namespaces={"re": "http://exslt.org/regular-expressions"})):
             _date = _basetag.xpath('following-sibling::label/span[re:match(@class, ".*postername$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
-        elif len(_basetag.xpath('//label/span[re:match(@class, ".*postername$")]', namespaces={"re": "http://exslt.org/regular-expressions"})):
-            _date = _basetag.xpath('//label/span[re:match(@class, ".*postername$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
+        elif len(_basetag.xpath('child::label/span[re:match(@class, ".*postername$")]', namespaces={"re": "http://exslt.org/regular-expressions"})):
+            _date = _basetag.xpath('child::label/span[re:match(@class, ".*postername$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
         else:
             _date = _basetag.xpath('following-sibling::label/span[re:match(@class, ".*replytitle$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
         result['date'] = _date[0].strip()
@@ -144,6 +144,8 @@ class Parser(BasicParser):
                 _size = _basetag.xpath('preceding-sibling::span[@class="filesize"]/em/text()')
                 if not len(_size):
                     _size = _basetag.xpath('preceding-sibling::span[@class="filesize"]/span[@class="filesize"]/em/text()')
+                    if not len(_size):
+                        _size = _basetag.xpath('child::span[@class="filesize"]//em/text()')
 
             result['image'] = {}
             result['image']['full'] = os.path.basename(_links[0])
