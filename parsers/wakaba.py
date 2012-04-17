@@ -37,9 +37,9 @@ class Parser(BasicParser):
         self.threadnum = _pathcomp[tindex][:-5]
 
     def get_posts_number(self):
-        _reflinks = self.source.xpath('//span[@class="reflink"]/a/text()')
-        if _reflinks:
-            return [link.replace(u"№", "").replace("No.", "") for link in _reflinks]
+        _postids = [postid.replace(u"№", "").replace("No.", "") for postid in self.source.xpath('//span[@class="reflink"]/a/text()') ]
+        if _postids:
+            return filter(None, _postids)
         else:
             return None
 
@@ -71,11 +71,11 @@ class Parser(BasicParser):
 
     def get_post(self, postNumber):
         result = {}
-        _basetag = self.source.xpath('//a[@id="' + postNumber + '"]')
+        _basetag = self.source.xpath('//div[@class="oppost"]') + self.source.xpath('//td[@id="' + postNumber + '"]')
         if not len(_basetag):
             _basetag = self.source.xpath('//a[@name="' + postNumber + '"]')
             if not len(_basetag):
-                _basetag = self.source.xpath('//td[@id="' + postNumber + '"]')
+                _basetag = self.source.xpath('//a[@id="' + postNumber + '"]')
                 if not len(_basetag):
                     return None
          
@@ -101,10 +101,10 @@ class Parser(BasicParser):
             _date = _basetag.xpath('following-sibling::label/span[re:match(@class, ".*postertrip$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
         elif len(_basetag.xpath('following-sibling::label/span[re:match(@class, ".*postername$")]', namespaces={"re": "http://exslt.org/regular-expressions"})):
             _date = _basetag.xpath('following-sibling::label/span[re:match(@class, ".*postername$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
-        elif len(_basetag.xpath('child::label/span[re:match(@class, ".*postertrip$")]', namespaces={"re": "http://exslt.org/regular-expressions"})):
-            _date = _basetag.xpath('child::label/span[re:match(@class, ".*postertrip$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
-        elif len(_basetag.xpath('child::label/span[re:match(@class, ".*postername$")]', namespaces={"re": "http://exslt.org/regular-expressions"})):
-            _date = _basetag.xpath('child::label/span[re:match(@class, ".*postername$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
+        elif len(_basetag.xpath('child::span[re:match(@class, ".*postertrip$")]', namespaces={"re": "http://exslt.org/regular-expressions"})):
+            _date = _basetag.xpath('child::span[re:match(@class, ".*postertrip$")]/following-sibling::text()/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
+        elif len(_basetag.xpath('child::span[re:match(@class, ".*postername$")]', namespaces={"re": "http://exslt.org/regular-expressions"})):
+            _date = _basetag.xpath('child::span[re:match(@class, ".*postername$")]/following-sibling::text()/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
         else:
             _date = _basetag.xpath('following-sibling::label/span[re:match(@class, ".*replytitle$")]/following-sibling::text()', namespaces={"re": "http://exslt.org/regular-expressions"})
         if not len (_date[0].strip()):
